@@ -1,14 +1,17 @@
-"""CAMELS audit module."""
-
+"""CAMELS audit stage."""
 from __future__ import annotations
 
 import logging
 
-__all__ = ["run"]
+from camels.core import register_stage
+from camels.core.stage import StageContext
 
 logger = logging.getLogger(__name__)
 
 
-def run() -> None:
-    """Placeholder pipeline step for audit."""
-    logger.info("Running audit pipeline step (placeholder).")
+@register_stage("audit", "Collect and publish ingestion audit trails.")
+def run(context: StageContext) -> None:
+    """Placeholder audit implementation."""
+
+    logger.info("Audit artifacts will be written under: %s", context.settings.output_dir)
+    logger.info("Audit stage placeholder executed. Implement traceability logic here.")
