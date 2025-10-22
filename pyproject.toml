@@ -24,5 +24,6 @@ dev = [
 [project.scripts]
 camels = "scripts.camels:app"
 
-[tool.setuptools]
-packages = ["camels"]
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["camels*"]
