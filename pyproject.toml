@@ -13,7 +13,9 @@ dependencies = [
     "typer[all]>=0.9.0",
     "python-dotenv>=1.0.0",
     "rich>=13.0.0",
-    "PyYAML>=6.0"
+    "PyYAML>=6.0",
+    "openpyxl>=3.1.2",
+    "pypdf>=3.0.0"
 ]
 
 [project.optional-dependencies]
@@ -24,5 +26,6 @@ dev = [
 [project.scripts]
 camels = "scripts.camels:app"
 
-[tool.setuptools]
-packages = ["camels"]
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["camels*"]
