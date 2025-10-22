@@ -1,0 +1,53 @@
+bank_id,name,country,regulator
+citibank_na_us,Citibank N.A. (EE.UU),Estados Unidos,Office of the Comptroller of the Currency
+bank_of_america_na_us,Bank of America N.A. (EE.UU),Estados Unidos,Office of the Comptroller of the Currency
+bradesco_bac_florida_us,Bradesco BAC Florida (EE.UU),Estados Unidos,Office of the Comptroller of the Currency
+hsbc_usa,HSBC (USA),Estados Unidos,Office of the Comptroller of the Currency
+scotiabank_canada,Scotiabank (Canadá),Canada,Office of the Superintendent of Financial Institutions
+banco_gt_continental_sa,Banco G&T Continental, S.A.,Guatemala,Superintendencia de Bancos de Guatemala
+banco_industrial_sa_gt,Banco Industrial, S.A.,Guatemala,Superintendencia de Bancos de Guatemala
+banco_prometerica_sa_gt,Banco Promerica, S.A.,Guatemala,Superintendencia de Bancos de Guatemala
+banco_ficohsa_gt,Banco Ficohsa Guatemala,Guatemala,Superintendencia de Bancos de Guatemala
+bac_credomatic_gt,Banco de América Central, S.A. (BAC Credomatic GT),Guatemala,Superintendencia de Bancos de Guatemala
+citibank_na_gt,Citibank N.A. Sucursal Guatemala,Guatemala,Superintendencia de Bancos de Guatemala
+banrural_gt,Banco de Desarrollo Rural, S.A. (Banrural),Guatemala,Superintendencia de Bancos de Guatemala
+chn_gt,Crédito Hipotecario Nacional (CHN),Guatemala,Superintendencia de Bancos de Guatemala
+interbanco_gt,Banco Internacional, S.A. (InterBanco),Guatemala,Superintendencia de Bancos de Guatemala
+banco_inmobiliario_gt,Banco Inmobiliario, S.A.,Guatemala,Superintendencia de Bancos de Guatemala
+banco_lafise_gt,Banco LAFISE, S.A.,Guatemala,Superintendencia de Bancos de Guatemala
+banco_agricola_sv,Banco Agrícola, S.A.,El Salvador,Superintendencia del Sistema Financiero
+banco_prometerica_sv,Banco Promerica, S.A.,El Salvador,Superintendencia del Sistema Financiero
+banco_industrial_sv,Banco Industrial El Salvador, S.A.,El Salvador,Superintendencia del Sistema Financiero
+citibank_na_sv,Citibank N.A. Sucursal El Salvador,El Salvador,Superintendencia del Sistema Financiero
+banco_davivienda_sv,Banco Davivienda Salvadoreño,El Salvador,Superintendencia del Sistema Financiero
+bac_sv,Banco de América Central, S.A. (BAC El Salvador),El Salvador,Superintendencia del Sistema Financiero
+lafise_sv,Banco LAFISE El Salvador,El Salvador,Superintendencia del Sistema Financiero
+banpais_hn,Banco del País, S.A. (Banpaís),Honduras,Comisión Nacional de Bancos y Seguros
+ficohsa_hn,Banco Ficohsa Honduras,Honduras,Comisión Nacional de Bancos y Seguros
+banco_occidente_hn,Banco de Occidente, S.A.,Honduras,Comisión Nacional de Bancos y Seguros
+citibank_na_hn,Citibank N.A. Sucursal Honduras,Honduras,Comisión Nacional de Bancos y Seguros
+banco_atlantida_hn,Banco Atlántida, S.A.,Honduras,Comisión Nacional de Bancos y Seguros
+bac_hn,Banco de América Central Honduras (BAC Honduras),Honduras,Comisión Nacional de Bancos y Seguros
+banco_davivienda_hn,Banco Davivienda Honduras,Honduras,Comisión Nacional de Bancos y Seguros
+lafise_bancentro_ni,Banco LAFISE Bancentro,Nicaragua,Superintendencia de Bancos y Otras Instituciones Financieras
+banpro_ni,Banco de la Producción, S.A. (Banpro),Nicaragua,Superintendencia de Bancos y Otras Instituciones Financieras
+bac_ni,Banco de América Central Nicaragua (BAC),Nicaragua,Superintendencia de Bancos y Otras Instituciones Financieras
+bncr_cr,Banco Nacional de Costa Rica (BNCR),Costa Rica,Superintendencia General de Entidades Financieras
+citibank_na_cr,Citibank N.A. Sucursal Costa Rica,Costa Rica,Superintendencia General de Entidades Financieras
+scotiabank_cr,Scotiabank Costa Rica,Costa Rica,Superintendencia General de Entidades Financieras
+banco_davivienda_cr,Banco Davivienda Costa Rica,Costa Rica,Superintendencia General de Entidades Financieras
+bi_bank_pa,Bi Bank, S.A. (Grupo BI),Panamá,Superintendencia de Bancos de Panamá
+bac_panama,BAC International Bank, Inc. (BAC Panamá),Panamá,Superintendencia de Bancos de Panamá
+banco_general_pa,Banco General, S.A.,Panamá,Superintendencia de Bancos de Panamá
+banco_ficohsa_pa,Banco Ficohsa (Panamá), S.A.,Panamá,Superintendencia de Bancos de Panamá
+banco_lafise_pa,Banco LAFISE Panamá, S.A.,Panamá,Superintendencia de Bancos de Panamá
+citibank_na_pa,Citibank N.A. Sucursal Panamá,Panamá,Superintendencia de Bancos de Panamá
+scotiabank_pa,Scotiabank (Panamá),Panamá,Superintendencia de Bancos de Panamá
+banco_popular_rd,Banco Popular Dominicano,República Dominicana,Superintendencia de Bancos de la República Dominicana
+citibank_na_rd,Citibank N.A. Sucursal R.D.,República Dominicana,Superintendencia de Bancos de la República Dominicana
+banco_ve_pormas_mx,Banco Ve por Más, S.A. (Bx+),México,Comisión Nacional Bancaria y de Valores
+citibanamex_mx,Citibanamex (Banco Nacional de México),México,Comisión Nacional Bancaria y de Valores
+banco_cuscatlan_sv,Banco Cuscatlán,El Salvador,Superintendencia del Sistema Financiero
+banco_bct_cr,Banco BCT,Costa Rica,Superintendencia General de Entidades Financieras
+multibank_pa,Multibank,Panamá,Superintendencia de Bancos de Panamá
+banesco_rd,Banesco,República Dominicana,Superintendencia de Bancos de la República Dominicana
