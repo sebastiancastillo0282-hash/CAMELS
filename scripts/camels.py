@@ -1,25 +1,46 @@
 """Command line interface for the CAMELS workflow."""
 from __future__ import annotations
 
-import importlib
+import argparse
 import logging
 import logging.config
 import os
 from pathlib import Path
 from typing import Iterable, List, Optional
 
-import typer
-import yaml
-from dotenv import load_dotenv
-from rich.console import Console
+from camels import StageContext, StageRunner, bootstrap, create_default_context, registry
+from camels.settings import Settings
 
-load_dotenv()
+def load_environment() -> None:
+    candidates = []
+    if env_file := os.getenv("ENV_FILE"):
+        candidates.append(Path(env_file))
+    candidates.append(Path(".env"))
 
-console = Console()
+    for path in candidates:
+        if not path.exists():
+            continue
+        with path.open("r", encoding="utf-8") as handle:
+            for raw_line in handle:
+                line = raw_line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                if "=" not in line:
+                    continue
+                key, _, value = line.partition("=")
+                key = key.strip()
+                value = value.strip().strip('"')
+                os.environ.setdefault(key, value)
+
+
+load_environment()
+
+logger = logging.getLogger(__name__)
 
 
 def configure_logging() -> None:
     """Configure logging using YAML/INI files or basic configuration."""
+
     config_candidates = []
     if config_env := os.getenv("LOGGING_CONFIG"):
         config_candidates.append(Path(config_env))
@@ -32,18 +53,17 @@ def configure_logging() -> None:
             continue
         suffix = config_path.suffix.lower()
         try:
-            if suffix in {".yaml", ".yml"}:
-                with config_path.open("r", encoding="utf-8") as handle:
-                    config = yaml.safe_load(handle)
-                logging.config.dictConfig(config)
+            if suffix in {".ini", ".cfg"}:
+                logging.config.fileConfig(config_path, disable_existing_loggers=False)
             else:
-                logging.config.fileConfig(
-                    config_path, disable_existing_loggers=False
+                print(
+                    f"Skipping unsupported logging config {config_path}. Using default logging configuration."
                 )
+                continue
             return
         except Exception as exc:  # pragma: no cover - safety net for config errors
-            console.print(
-                f"[red]Failed to load logging config {config_path}: {exc}. Falling back to basic logging.[/]"
+            print(
+                f"Failed to load logging config {config_path}: {exc}. Falling back to basic logging."
             )
             break
 
@@ -54,82 +74,109 @@ def configure_logging() -> None:
 
 
 configure_logging()
-
-app = typer.Typer(help="Run the CAMELS analytics workflow.")
-
-STAGES = {
-    "ingest": ("camels.ingestion", "run"),
-    "normalize": ("camels.normalization", "run"),
-    "score": ("camels.scoring", "run"),
-    "dashboard": ("camels.dashboard", "run"),
-    "export": ("camels.export", "run"),
-    "audit": ("camels.audit", "run"),
-}
+bootstrap()
+runner = StageRunner(registry)
 
 
-def _execute(stage: str) -> None:
-    module_name, attr = STAGES[stage]
-    module = importlib.import_module(module_name)
-    stage_fn = getattr(module, attr)
-    console.log(f"Running [bold]{stage}[/] stage via {module_name}.{attr}()")
-    stage_fn()
+def _context() -> tuple[Settings, StageContext]:
+    settings = Settings.load()
+    settings.ensure_directories()
+    context = create_default_context(settings)
+    return settings, context
 
 
-def _resolve_stages(stages: Optional[Iterable[str]]) -> List[str]:
-    if not stages:
-        return list(STAGES.keys())
-    invalid = [stage for stage in stages if stage not in STAGES]
-    if invalid:
-        raise typer.BadParameter(f"Unknown stages: {', '.join(invalid)}")
-    return list(dict.fromkeys(stages))
-
-
-@app.command()
-def run(
-    stages: Optional[List[str]] = typer.Argument(
-        None, help="Stages to run in order. Defaults to all."
+def _run_pipeline(stages: Optional[Iterable[str]]) -> None:
+    settings, context = _context()
+    try:
+        resolved = runner.resolve(None if stages is None else list(stages))
+    except ValueError as exc:
+        print(f"Error: {exc}")
+        raise SystemExit(2) from exc
+    logger.info(
+        "Running stages %s with data directory %s and output %s.",
+        resolved,
+        settings.data_dir,
+        settings.output_dir,
     )
-) -> None:
-    """Run the full pipeline, optionally limiting to specific stages."""
-    for stage in _resolve_stages(stages):
-        _execute(stage)
+    runner.run(resolved, context)
 
 
-@app.command()
-def ingest() -> None:
-    """Run only the ingestion stage."""
-    _execute("ingest")
+def _single_stage(stage: str) -> None:
+    settings, context = _context()
+    runner.run([stage], context)
 
 
-@app.command()
-def normalize() -> None:
-    """Run only the normalization stage."""
-    _execute("normalize")
+def command_run(args: argparse.Namespace) -> None:
+    stages: Optional[List[str]] = args.stages if args.stages else None
+    _run_pipeline(stages)
 
 
-@app.command()
-def score() -> None:
-    """Run only the scoring stage."""
-    _execute("score")
+def command_stages(_: argparse.Namespace) -> None:
+    print("CAMELS Registered Stages:")
+    for definition in registry.items():
+        print(f"- {definition.name}: {definition.description} ({definition.module})")
 
 
-@app.command()
-def dashboard() -> None:
-    """Run only the dashboard stage."""
-    _execute("dashboard")
+def command_ingest(_: argparse.Namespace) -> None:
+    _single_stage("ingest")
 
 
-@app.command()
-def export() -> None:
-    """Run only the export stage."""
-    _execute("export")
+def command_normalize(_: argparse.Namespace) -> None:
+    _single_stage("normalize")
 
 
-@app.command()
-def audit() -> None:
-    """Run only the audit stage."""
-    _execute("audit")
+def command_score(_: argparse.Namespace) -> None:
+    _single_stage("score")
 
 
-if __name__ == "__main__":
-    app()
+def command_dashboard(_: argparse.Namespace) -> None:
+    _single_stage("dashboard")
+
+
+def command_export(_: argparse.Namespace) -> None:
+    _single_stage("export")
+
+
+def command_audit(_: argparse.Namespace) -> None:
+    _single_stage("audit")
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Run the CAMELS analytics workflow.")
+    subparsers = parser.add_subparsers(dest="command")
+    subparsers.required = True
+
+    parser_run = subparsers.add_parser("run", help="Run the full pipeline")
+    parser_run.add_argument(
+        "stages",
+        nargs="*",
+        help="Optional ordered list of stages to run instead of all registered stages.",
+    )
+    parser_run.set_defaults(func=command_run)
+
+    parser_stages = subparsers.add_parser("stages", help="List registered stages")
+    parser_stages.set_defaults(func=command_stages)
+
+    for name, func in (
+        ("ingest", command_ingest),
+        ("normalize", command_normalize),
+        ("score", command_score),
+        ("dashboard", command_dashboard),
+        ("export", command_export),
+        ("audit", command_audit),
+    ):
+        sub = subparsers.add_parser(name, help=f"Run only the {name} stage")
+        sub.set_defaults(func=func)
+
+    return parser
+
+
+def main(argv: Optional[List[str]] = None) -> int:
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    args.func(args)
+    return 0
+
+
+if __name__ == "__main__":  # pragma: no cover - entry point for CLI usage
+    raise SystemExit(main())

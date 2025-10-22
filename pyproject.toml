@@ -9,20 +9,31 @@ description = "Command-line toolkit for the CAMELS analytics pipeline."
 authors = [{ name = "CAMELS Team" }]
 readme = "README.md"
 requires-python = ">=3.9"
-dependencies = [
-    "typer[all]>=0.9.0",
-    "python-dotenv>=1.0.0",
-    "rich>=13.0.0",
-    "PyYAML>=6.0"
-]
+dependencies = []
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=7.0.0"
+    "pytest>=7.4",
+    "black>=23.0",
+    "ruff>=0.3",
 ]
 
 [project.scripts]
-camels = "scripts.camels:app"
+camels = "scripts.camels:main"
 
-[tool.setuptools]
-packages = ["camels"]
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["camels*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["camels", "scripts", "tests"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+testpaths = ["tests"]
