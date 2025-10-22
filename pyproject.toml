@@ -31,16 +31,3 @@ camels = "scripts.camels:app"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["camels*"]
-
-[tool.ruff]
-line-length = 100
-target-version = "py311"
-src = ["camels", "scripts", "tests"]
-
-[tool.black]
-line-length = 100
-target-version = ["py311"]
-
-[tool.pytest.ini_options]
-addopts = "-ra"
-testpaths = ["tests"]
