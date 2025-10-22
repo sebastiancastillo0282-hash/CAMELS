@@ -1,8 +1,15 @@
+# Runtime artifacts
 __pycache__/
 *.py[cod]
-*.log
+*.sqlite
 .env
-.venv/
+.env.local
+artifacts/
+data/*
+!data/reference/
+!data/reference/banks.csv
+logs/
+storage/
+.pytest_cache/
+.ruff_cache/
 .DS_Store
-.idea/
-.vscode/

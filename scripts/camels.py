@@ -1,25 +1,30 @@
 """Command line interface for the CAMELS workflow."""
 from __future__ import annotations
 
-import importlib
 import logging
 import logging.config
 import os
 from pathlib import Path
-from typing import Iterable, List, Optional
+from typing import List, Optional
 
 import typer
 import yaml
 from dotenv import load_dotenv
 from rich.console import Console
+from rich.table import Table
+
+from camels import StageContext, StageRunner, bootstrap, create_default_context, registry
+from camels.settings import Settings
 
 load_dotenv()
 
 console = Console()
+app = typer.Typer(help="Run the CAMELS analytics workflow.")
 
 
 def configure_logging() -> None:
     """Configure logging using YAML/INI files or basic configuration."""
+
     config_candidates = []
     if config_env := os.getenv("LOGGING_CONFIG"):
         config_candidates.append(Path(config_env))
@@ -54,81 +59,94 @@ def configure_logging() -> None:
 
 
 configure_logging()
-
-app = typer.Typer(help="Run the CAMELS analytics workflow.")
-
-STAGES = {
-    "ingest": ("camels.ingestion", "run"),
-    "normalize": ("camels.normalization", "run"),
-    "score": ("camels.scoring", "run"),
-    "dashboard": ("camels.dashboard", "run"),
-    "export": ("camels.export", "run"),
-    "audit": ("camels.audit", "run"),
-}
+bootstrap()
+runner = StageRunner(registry)
 
 
-def _execute(stage: str) -> None:
-    module_name, attr = STAGES[stage]
-    module = importlib.import_module(module_name)
-    stage_fn = getattr(module, attr)
-    console.log(f"Running [bold]{stage}[/] stage via {module_name}.{attr}()")
-    stage_fn()
-
-
-def _resolve_stages(stages: Optional[Iterable[str]]) -> List[str]:
-    if not stages:
-        return list(STAGES.keys())
-    invalid = [stage for stage in stages if stage not in STAGES]
-    if invalid:
-        raise typer.BadParameter(f"Unknown stages: {', '.join(invalid)}")
-    return list(dict.fromkeys(stages))
+def _context() -> tuple[Settings, StageContext]:
+    settings = Settings.load()
+    settings.ensure_directories()
+    context = create_default_context(settings)
+    return settings, context
 
 
 @app.command()
 def run(
     stages: Optional[List[str]] = typer.Argument(
-        None, help="Stages to run in order. Defaults to all."
+        None, help="Stages to run in order. Defaults to all registered stages."
     )
 ) -> None:
     """Run the full pipeline, optionally limiting to specific stages."""
-    for stage in _resolve_stages(stages):
-        _execute(stage)
+
+    settings, context = _context()
+    try:
+        resolved = runner.resolve(stages)
+    except ValueError as exc:
+        raise typer.BadParameter(str(exc)) from exc
+    console.log(
+        f"Running stages {resolved} with data directory {settings.data_dir} and output {settings.output_dir}."
+    )
+    runner.run(resolved, context)
+
+
+@app.command()
+def stages() -> None:
+    """List registered stages and descriptions."""
+
+    table = Table(title="CAMELS Registered Stages")
+    table.add_column("Stage", style="cyan", no_wrap=True)
+    table.add_column("Module", style="magenta")
+    table.add_column("Description", style="green")
+    for definition in registry.items():
+        table.add_row(definition.name, definition.module, definition.description)
+    console.print(table)
+
+
+def _single_stage(stage: str) -> None:
+    settings, context = _context()
+    runner.run([stage], context)
 
 
 @app.command()
 def ingest() -> None:
     """Run only the ingestion stage."""
-    _execute("ingest")
+
+    _single_stage("ingest")
 
 
 @app.command()
 def normalize() -> None:
     """Run only the normalization stage."""
-    _execute("normalize")
+
+    _single_stage("normalize")
 
 
 @app.command()
 def score() -> None:
     """Run only the scoring stage."""
-    _execute("score")
+
+    _single_stage("score")
 
 
 @app.command()
 def dashboard() -> None:
     """Run only the dashboard stage."""
-    _execute("dashboard")
+
+    _single_stage("dashboard")
 
 
 @app.command()
 def export() -> None:
     """Run only the export stage."""
-    _execute("export")
+
+    _single_stage("export")
 
 
 @app.command()
 def audit() -> None:
     """Run only the audit stage."""
-    _execute("audit")
+
+    _single_stage("audit")
 
 
 if __name__ == "__main__":

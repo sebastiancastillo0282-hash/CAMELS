@@ -1,0 +1,155 @@
+version: 1
+defaults:
+  scores:
+    green: 100
+    yellow: 60
+    red: 20
+    missing: 0
+  rating_thresholds:
+    green: 80
+    yellow: 50
+composite:
+  weights:
+    capital: 0.2
+    assets: 0.2
+    management: 0.15
+    earnings: 0.15
+    liquidity: 0.15
+    sensitivity: 0.15
+pillars:
+  capital:
+    weight: 0.2
+    indicators:
+      cet1_rwa:
+        weight: 0.4
+        thresholds:
+          green:
+            min: 0.12
+          yellow:
+            min: 0.08
+      tcr:
+        weight: 0.35
+        thresholds:
+          green:
+            min: 0.15
+          yellow:
+            min: 0.12
+      leverage:
+        weight: 0.25
+        thresholds:
+          green:
+            min: 0.05
+          yellow:
+            min: 0.03
+  assets:
+    weight: 0.2
+    indicators:
+      npl:
+        weight: 0.4
+        thresholds:
+          green:
+            max: 0.03
+          yellow:
+            max: 0.05
+      npl_coverage:
+        weight: 0.35
+        thresholds:
+          green:
+            min: 1.0
+          yellow:
+            min: 0.8
+      cost_of_risk:
+        weight: 0.25
+        thresholds:
+          green:
+            max: 0.02
+          yellow:
+            max: 0.04
+  management:
+    weight: 0.15
+    indicators:
+      efficiency_ratio:
+        weight: 0.6
+        thresholds:
+          green:
+            max: 0.55
+          yellow:
+            max: 0.65
+      regulatory_events:
+        weight: 0.4
+        thresholds:
+          green:
+            max: 1
+          yellow:
+            max: 3
+  earnings:
+    weight: 0.15
+    indicators:
+      roe:
+        weight: 0.4
+        thresholds:
+          green:
+            min: 0.12
+          yellow:
+            min: 0.08
+      roa:
+        weight: 0.3
+        thresholds:
+          green:
+            min: 0.012
+          yellow:
+            min: 0.008
+      nim:
+        weight: 0.3
+        thresholds:
+          green:
+            min: 0.035
+          yellow:
+            min: 0.025
+  liquidity:
+    weight: 0.15
+    indicators:
+      lcr:
+        weight: 0.4
+        thresholds:
+          green:
+            min: 1.0
+          yellow:
+            min: 0.9
+      nsfr:
+        weight: 0.3
+        thresholds:
+          green:
+            min: 1.0
+          yellow:
+            min: 0.9
+      loans_deposits:
+        weight: 0.3
+        thresholds:
+          green:
+            min: 0.8
+            max: 1.0
+          yellow:
+            min: 0.7
+            max: 1.1
+  sensitivity:
+    weight: 0.15
+    indicators:
+      fx_open_position:
+        weight: 0.5
+        thresholds:
+          green:
+            min: -0.2
+            max: 0.2
+          yellow:
+            min: -0.3
+            max: 0.3
+      duration_gap:
+        weight: 0.5
+        thresholds:
+          green:
+            min: -2.0
+            max: 2.0
+          yellow:
+            min: -3.0
+            max: 3.0
