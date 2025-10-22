@@ -6,21 +6,13 @@ import logging
 from camels.core import register_stage
 from camels.core.stage import StageContext
 
-from .pipeline import run_pipeline
-
 logger = logging.getLogger(__name__)
 
 
 @register_stage("ingest", "Download, validate, and archive raw supervisory data.")
 def run(context: StageContext) -> None:
-    """Execute the ingestion pipeline."""
+    """Placeholder ingestion implementation."""
 
-    logger.info("Starting ingestion with data directory %s", context.settings.data_dir)
-    results = run_pipeline(context)
-    successes = sum(1 for entry in results if entry.status == "success")
-    failures = len(results) - successes
-    logger.info(
-        "Ingestion completed: %d success, %d failure(s)",
-        successes,
-        failures,
-    )
+    logger.info("Using data directory: %s", context.settings.data_dir)
+    logger.debug("Run context: %s", context)
+    logger.info("Ingestion stage placeholder executed. Implement data fetching here.")

@@ -45,12 +45,11 @@ camels run ingest score # executes only the requested subset
 camels stages           # prints the registry of stages and descriptions
 ```
 
-Each module under `camels/` registers a stage via the orchestration infrastructure in
-`camels.core`. The `StageRunner` resolves requested stages, constructs a `StageContext`
-(with run ID, timestamp, workspace, and environment-driven settings), and logs lifecycle
-events. The ingestion stage now consumes `config/sources.yaml`, downloads regulator
-documents into `data/raw/<fecha>/`, parses CSV/XLSX/PDF payloads, and records provenance
-metadata in SQLite under `ingestion_log` for traceability.
+Each module under `camels/` registers a placeholder stage via the orchestration
+infrastructure in `camels.core`. The `StageRunner` resolves requested stages, constructs a
+`StageContext` (with run ID, timestamp, workspace, and environment-driven settings), and
+logs lifecycle events. Replace the placeholder logic inside each stage as subsequent
+phases of the roadmap are implemented.
 
 ## Tooling
 - `requirements.txt` / `pyproject.toml`: runtime dependencies (Typer, Rich, PyYAML,
@@ -62,7 +61,7 @@ metadata in SQLite under `ingestion_log` for traceability.
 - `Dockerfile`: builds a lightweight image that runs `python -m scripts.camels run` by
   default.
 
-The repository currently fulfills Phases 0 and 1 of the roadmap: a portable project
-scaffold with stage packages, centralized configuration, logging, and an automated
-ingestion layer ready to be extended with normalization, scoring, dashboard, export, and
-auditing capabilities in later phases.
+This scaffold fulfills Phase 0 of the roadmap: a portable project skeleton with stage
+packages, centralized configuration, logging, and a single entry point that can be
+extended with real ingestion, normalization, scoring, dashboard, export, and auditing
+capabilities in later phases.
