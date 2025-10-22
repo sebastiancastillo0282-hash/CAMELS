@@ -1,0 +1,69 @@
+# Official data source catalog for CAMELS ingestion.
+sources:
+  - id: sib_guatemala_bac_credomatic_gt
+    name: "Superintendencia de Bancos de Guatemala - BAC Credomatic"
+    country: "Guatemala"
+    regulator: "Superintendencia de Bancos de Guatemala"
+    bank: "Banco de América Central, S.A. (BAC Credomatic GT)"
+    url: "https://example.com/guatemala/bac_credomatic/2023Q4_capital.csv"
+    format: csv
+    frequency: quarterly
+    encoding: utf-8
+    indicators:
+      - CET1/RWA
+      - TCR
+      - Leverage
+    description: "Estados de capital regulatorio reportados trimestralmente."
+  - id: sib_guatemala_banrural_assets
+    name: "Superintendencia de Bancos de Guatemala - Banrural"
+    country: "Guatemala"
+    regulator: "Superintendencia de Bancos de Guatemala"
+    bank: "Banco de Desarrollo Rural, S.A. (Banrural)"
+    url: "https://example.com/guatemala/banrural/2023Q4_assets.xlsx"
+    format: xlsx
+    frequency: quarterly
+    worksheet: "Indicadores"
+    indicators:
+      - NPL
+      - Cobertura NPL
+      - Cost of Risk
+    description: "Indicadores de calidad de activos provistos por el regulador."
+  - id: ssf_el_salvador_davivienda_pdf
+    name: "Superintendencia del Sistema Financiero El Salvador - Davivienda"
+    country: "El Salvador"
+    regulator: "Superintendencia del Sistema Financiero"
+    bank: "Banco Davivienda Salvadoreño"
+    url: "https://example.com/elsalvador/davivienda/2023Q4_management.pdf"
+    format: pdf
+    frequency: quarterly
+    indicators:
+      - Efficiency ratio
+      - Eventos regulatorios
+    description: "Informe de gestión y eficiencia operativa."
+  - id: cnbs_honduras_ficohsa
+    name: "Comisión Nacional de Bancos y Seguros Honduras - Ficohsa"
+    country: "Honduras"
+    regulator: "Comisión Nacional de Bancos y Seguros"
+    bank: "Banco Ficohsa Honduras"
+    url: "https://example.com/honduras/ficohsa/2023Q4_liquidity.csv"
+    format: csv
+    frequency: quarterly
+    encoding: latin-1
+    indicators:
+      - LCR
+      - NSFR
+      - Loans/Deposits
+    description: "Reporte de liquidez del trimestre."
+  - id: superintendencia_panama_banco_general
+    name: "Superintendencia de Bancos de Panamá - Banco General"
+    country: "Panamá"
+    regulator: "Superintendencia de Bancos de Panamá"
+    bank: "Banco General, S.A."
+    url: "https://example.com/panama/bancogeneral/2023Q4_sensitivity.xlsx"
+    format: xlsx
+    frequency: quarterly
+    worksheet: "Sensibilidad"
+    indicators:
+      - FX open position
+      - Duration gap proxy
+    description: "Reporte de sensibilidad al riesgo de mercado."

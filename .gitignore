@@ -1,8 +1,11 @@
+# Runtime artifacts
 __pycache__/
 *.py[cod]
-*.log
+*.sqlite
 .env
-.venv/
+.env.local
+artifacts/
+data/
+logs/
+storage/
 .DS_Store
-.idea/
-.vscode/
