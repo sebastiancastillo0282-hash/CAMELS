@@ -16,7 +16,11 @@ from rich.table import Table
 from camels import StageContext, StageRunner, bootstrap, create_default_context, registry
 from camels.settings import Settings
 
-load_dotenv()
+def load_environment() -> None:
+    candidates = []
+    if env_file := os.getenv("ENV_FILE"):
+        candidates.append(Path(env_file))
+    candidates.append(Path(".env"))
 
 console = Console()
 app = typer.Typer(help="Run the CAMELS analytics workflow.")
@@ -37,18 +41,17 @@ def configure_logging() -> None:
             continue
         suffix = config_path.suffix.lower()
         try:
-            if suffix in {".yaml", ".yml"}:
-                with config_path.open("r", encoding="utf-8") as handle:
-                    config = yaml.safe_load(handle)
-                logging.config.dictConfig(config)
+            if suffix in {".ini", ".cfg"}:
+                logging.config.fileConfig(config_path, disable_existing_loggers=False)
             else:
-                logging.config.fileConfig(
-                    config_path, disable_existing_loggers=False
+                print(
+                    f"Skipping unsupported logging config {config_path}. Using default logging configuration."
                 )
+                continue
             return
         except Exception as exc:  # pragma: no cover - safety net for config errors
-            console.print(
-                f"[red]Failed to load logging config {config_path}: {exc}. Falling back to basic logging.[/]"
+            print(
+                f"Failed to load logging config {config_path}: {exc}. Falling back to basic logging."
             )
             break
 
@@ -134,6 +137,16 @@ def dashboard() -> None:
 
     _single_stage("dashboard")
 
+    for name, func in (
+        ("ingest", command_ingest),
+        ("normalize", command_normalize),
+        ("score", command_score),
+        ("dashboard", command_dashboard),
+        ("export", command_export),
+        ("audit", command_audit),
+    ):
+        sub = subparsers.add_parser(name, help=f"Run only the {name} stage")
+        sub.set_defaults(func=func)
 
 @app.command()
 def export() -> None:
@@ -149,5 +162,5 @@ def audit() -> None:
     _single_stage("audit")
 
 
-if __name__ == "__main__":
-    app()
+if __name__ == "__main__":  # pragma: no cover - entry point for CLI usage
+    raise SystemExit(main())
