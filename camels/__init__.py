@@ -31,14 +31,7 @@ def __getattr__(name: str):  # pragma: no cover - passthrough to package metadat
 def bootstrap() -> None:
     """Import stage modules to ensure registration has occurred."""
 
-    from camels import (  # noqa: F401
-        ingestion,
-        normalization,
-        scoring,
-        export,
-        audit,
-        dashboard,
-    )
+    from camels import audit, dashboard, export, ingestion, normalization, scoring  # noqa: F401
 
 
 def create_default_context(settings: Settings | None = None) -> StageContext:

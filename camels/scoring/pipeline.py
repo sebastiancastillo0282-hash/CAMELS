@@ -3,12 +3,12 @@ from __future__ import annotations
 """Scoring pipeline orchestration."""
 
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 
 from .config import load_scoring_config
 from .engine import ScoringEngine
-from .models import CompositeScore, ScoringSummary
+from .models import ScoringSummary
 from .repository import IndicatorRepository
 from .storage import ScoringStore
 
@@ -18,8 +18,6 @@ logger = logging.getLogger(__name__)
 @dataclass(slots=True)
 class PipelineSummary(ScoringSummary):
     """Alias of :class:`ScoringSummary` for stage logging."""
-
-    scores: list[CompositeScore] = field(default_factory=list)
 
 
 def run_pipeline(*, sqlite_path: Path, config_path: Path, run_id: str) -> PipelineSummary:
@@ -54,7 +52,6 @@ def run_pipeline(*, sqlite_path: Path, config_path: Path, run_id: str) -> Pipeli
         banks_with_data=output.banks_with_values,
         indicators_with_values=output.indicators_with_values,
         latest_period=output.latest_period,
-        scores=output.scores,
     )
 
 

@@ -1,30 +1,15 @@
 """XLSX parser for ingestion."""
 from __future__ import annotations
 
-import importlib
-import importlib.util
 from pathlib import Path
 from typing import Dict, List
 
-_OPENPYXL_SPEC = importlib.util.find_spec("openpyxl")
-if _OPENPYXL_SPEC is not None:  # pragma: no cover - depends on environment availability
-    _openpyxl = importlib.import_module("openpyxl")
-    load_workbook = _openpyxl.load_workbook
-else:  # pragma: no cover - exercised when dependency is unavailable
-    load_workbook = None
+from openpyxl import load_workbook
 
 from .base import ParsedDataset
 
 
 def parse_xlsx(path: Path, *, worksheet: str | None = None) -> ParsedDataset:
-    if load_workbook is None:
-        metadata = {
-            "worksheet": worksheet,
-            "source": path.name,
-            "warning": "openpyxl not available",
-        }
-        return ParsedDataset(records=[], metadata=metadata)
-
     workbook = load_workbook(path, data_only=True, read_only=True)
     if worksheet:
         if worksheet not in workbook.sheetnames:

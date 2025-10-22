@@ -2,23 +2,13 @@
 from __future__ import annotations
 
 import csv
-import importlib
-import importlib.util
 import json
 import sqlite3
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Iterable, List, Mapping, Sequence, Tuple
 
-_OPENPYXL_SPEC = importlib.util.find_spec("openpyxl")
-if _OPENPYXL_SPEC is not None:  # pragma: no cover - depends on environment availability
-    _openpyxl = importlib.import_module("openpyxl")
-    Workbook = _openpyxl.Workbook
-    _openpyxl_utils = importlib.import_module("openpyxl.utils")
-    get_column_letter = _openpyxl_utils.get_column_letter
-else:  # pragma: no cover - exercised when dependency is unavailable
-    Workbook = None
-    get_column_letter = None
+from openpyxl import Workbook
 
 
 @dataclass(slots=True)
@@ -208,15 +198,6 @@ class ExportGenerator:
         portfolio: Sequence[Mapping[str, object]],
         indicators: Sequence[Mapping[str, object]],
     ) -> None:
-        if Workbook is None:
-            placeholder = {
-                "portfolio": portfolio,
-                "indicators": indicators,
-            }
-            with path.with_suffix(".json").open("w", encoding="utf-8") as handle:
-                json.dump(placeholder, handle, ensure_ascii=False, indent=2)
-            return
-
         workbook = Workbook()
         scores_sheet = workbook.active
         scores_sheet.title = "Scores"
@@ -226,6 +207,8 @@ class ExportGenerator:
         workbook.save(path)
 
     def _write_sheet(self, worksheet, rows: Sequence[Mapping[str, object]]) -> None:
+        from openpyxl.utils import get_column_letter
+
         fieldnames = self._determine_fieldnames(rows)
         if not fieldnames:
             fieldnames = ["message"]
@@ -240,10 +223,9 @@ class ExportGenerator:
                     for value in (row.get(field) for field in fieldnames)
                 ]
             )
-        if get_column_letter is not None:
-            for index, _ in enumerate(fieldnames, start=1):
-                column = get_column_letter(index)
-                worksheet.column_dimensions[column].width = 18
+        for index, _ in enumerate(fieldnames, start=1):
+            column = get_column_letter(index)
+            worksheet.column_dimensions[column].width = 18
 
     # ------------------------------------------------------------------
     # Utility helpers
