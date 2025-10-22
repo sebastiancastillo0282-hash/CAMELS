@@ -1,14 +1,17 @@
-"""CAMELS normalization module."""
-
+"""CAMELS normalization stage."""
 from __future__ import annotations
 
 import logging
 
-__all__ = ["run"]
+from camels.core import register_stage
+from camels.core.stage import StageContext
 
 logger = logging.getLogger(__name__)
 
 
-def run() -> None:
-    """Placeholder pipeline step for normalization."""
-    logger.info("Running normalization pipeline step (placeholder).")
+@register_stage("normalize", "Standardize CAMELS indicators and store them in SQLite.")
+def run(context: StageContext) -> None:
+    """Placeholder normalization implementation."""
+
+    logger.info("Writing normalized outputs to: %s", context.settings.sqlite_path)
+    logger.info("Normalization stage placeholder executed. Implement transformation logic here.")
