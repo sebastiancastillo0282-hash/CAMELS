@@ -1,14 +1,21 @@
-"""CAMELS dashboard module."""
-
+"""CAMELS dashboard stage."""
 from __future__ import annotations
 
 import logging
 
-__all__ = ["run"]
+from camels.core import register_stage
+from camels.core.stage import StageContext
 
 logger = logging.getLogger(__name__)
 
 
-def run() -> None:
-    """Placeholder pipeline step for dashboard."""
-    logger.info("Running dashboard pipeline step (placeholder).")
+@register_stage("dashboard", "Serve the local CAMELS analytics dashboard.")
+def run(context: StageContext) -> None:
+    """Placeholder dashboard implementation."""
+
+    logger.info(
+        "Dashboard placeholder listening on %s:%s",
+        context.settings.dashboard_host,
+        context.settings.dashboard_port,
+    )
+    logger.info("Dashboard stage placeholder executed. Implement UI startup here.")

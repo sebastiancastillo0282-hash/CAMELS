@@ -1,14 +1,17 @@
-"""CAMELS export module."""
-
+"""CAMELS export stage."""
 from __future__ import annotations
 
 import logging
 
-__all__ = ["run"]
+from camels.core import register_stage
+from camels.core.stage import StageContext
 
 logger = logging.getLogger(__name__)
 
 
-def run() -> None:
-    """Placeholder pipeline step for export."""
-    logger.info("Running export pipeline step (placeholder).")
+@register_stage("export", "Generate committee-ready CSV/Excel extracts.")
+def run(context: StageContext) -> None:
+    """Placeholder export implementation."""
+
+    logger.info("Exports will be saved to: %s", context.settings.output_dir)
+    logger.info("Export stage placeholder executed. Implement export writers here.")

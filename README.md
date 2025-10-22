@@ -1,56 +1,70 @@
 # CAMELS
 
-CAMELS (Coordinated Analytics for Metrics, Evaluation, and Lifecycle Scoring) provides a
-command-line toolkit for orchestrating data ingestion, normalization, scoring, dashboard
-publication, exporting, and auditing tasks.
+CAMELS (Coordinated Analytics for Metrics, Evaluation, and Lifecycle Scoring) is a local
+command-line toolkit that orchestrates data ingestion, normalization, scoring, dashboard
+serving, exports, and audit logging for the CAMELS risk methodology.
 
-## Installation (≤5 minutes)
-1. Ensure Python 3.9+ is installed.
-2. Clone this repository and create a virtual environment:
+## Quickstart (≤500 words total)
+1. **Install dependencies**
    ```bash
    make install
    ```
-   The command creates `.venv/` and installs the runtime dependencies listed in
-   `requirements.txt`.
+2. **Copy environment defaults**
+   ```bash
+   cp .env.example .env
+   ```
+3. **Activate the virtual environment and run the pipeline**
+   ```bash
+   . .venv/bin/activate
+   camels run
+   ```
 
 ## Configuration
-Copy `.env.example` to `.env` and adjust the values for your environment:
+The CLI loads `.env` automatically via `python-dotenv`. Key variables:
+
+- `CAMELS_DATA_DIR`: directory for raw regulator downloads (default `./data`).
+- `CAMELS_OUTPUT_DIR`: directory for generated exports and audit artifacts (default
+  `./artifacts`).
+- `CAMELS_DB_PATH`: SQLite database that stores normalized indicators and scores (default
+  `./camels.sqlite`).
+- `CAMELS_DASHBOARD_HOST` / `CAMELS_DASHBOARD_PORT`: interface where the Streamlit
+  dashboard should listen during Phase 4.
+- `LOG_LEVEL`: root logging verbosity (default `INFO`).
+
+The `Settings.ensure_directories()` helper automatically creates the data, output, and
+SQLite parent directories on every CLI invocation, so fresh checkouts work without extra
+setup.
+
+## Single Command Workflow
+The Typer-based CLI (`scripts/camels.py`) exposes the `camels` entry point defined in
+`pyproject.toml`. A single command runs the full Phase 0 pipeline skeleton:
+
 ```bash
-cp .env.example .env
+camels run              # executes every registered stage
+camels run ingest score # executes only the requested subset
+camels stages           # prints the registry of stages and descriptions
 ```
-Key variables include `CAMELS_DATA_DIR`, `CAMELS_OUTPUT_DIR`, and dashboard host/port
-settings. The CLI automatically loads `.env` through `python-dotenv` when commands run.
-Logging defaults to the `logging.yaml`/`logging.ini` configurations in the repository; you
-may point to either file through the standard `LOGGING_CONFIG` environment variable if
-needed.
 
-## Usage
-Activate the environment and run the pipeline:
-```bash
-. .venv/bin/activate
-camels run
-```
-`camels run` executes every stage sequentially. Provide stage names to limit execution,
-e.g. `camels run ingest score`. Each stage also has a direct shortcut (`camels ingest`,
-`camels normalize`, `camels score`, `camels dashboard`, `camels export`, and
-`camels audit`). The placeholders currently log their invocation so you can wire your own
-business logic inside the corresponding modules under `camels/`.
+Each module under `camels/` registers a stage via the orchestration infrastructure in
+`camels.core`. The `StageRunner` resolves requested stages, constructs a `StageContext`
+(with run ID, timestamp, workspace, and environment-driven settings), and logs lifecycle
+events. The ingestion stage now consumes `config/sources.yaml`, downloads regulator
+documents into `data/raw/<fecha>/`, parses CSV/XLSX/PDF payloads, and records provenance
+metadata in SQLite under `ingestion_log` for traceability.
 
-## Docker
-Build and execute the workflow inside a container:
-```bash
-make docker-build
-make docker-run
-```
-The Docker image runs `python -m scripts.camels run` by default and loads variables from
-`.env.example`. Mount custom data directories or override environment variables as needed
-when invoking `docker run`.
+The normalization stage provisions the SQLite schema (`banks`, `indicators`, `indicator_history`, `normalization_log`), syncs the >50-bank seed list in `data/reference/banks.csv`, loads CAMELS indicator definitions, and reprocesses the most recent successful ingestions to generate quarter-aligned indicator history. It flags duplicates, outliers, and coverage gaps (<8 quarters) while persisting normalized values with provenance metadata.
 
-## Project Structure
-- `camels/`: Python package with placeholder modules for each pipeline step.
-- `scripts/camels.py`: Typer-based CLI exposing the `camels` command.
-- `logging.ini` / `logging.yaml`: Ready-to-use logging configurations.
-- `Makefile`: Convenience targets for installation, execution, and container workflows.
+## Tooling
+- `requirements.txt` / `pyproject.toml`: runtime dependencies (Typer, Rich, PyYAML,
+  python-dotenv) and the `camels` console script binding.
+- `.env.example`: template for environment configuration.
+- `logging.yaml` and `logging.ini`: ready-to-use logging profiles. You may override via
+  `LOGGING_CONFIG`.
+- `Makefile`: helper targets for installation, execution, Docker workflows, and cleanup.
+- `Dockerfile`: builds a lightweight image that runs `python -m scripts.camels run` by
+  default.
 
-You are now ready to customize each module, integrate your data sources, and automate
-CAMELS end to end—all from a single, consistent interface.
+The repository currently fulfills Phases 0, 1, and 2 of the roadmap: a portable
+project scaffold with stage packages, centralized configuration, logging, automated
+ingestion, and a normalization layer that curates bank registries and standardized
+indicator history ready for downstream scoring, dashboard, export, and auditing phases.
