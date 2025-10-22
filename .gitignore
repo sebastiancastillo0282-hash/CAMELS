@@ -5,9 +5,7 @@ __pycache__/
 .env
 .env.local
 artifacts/
-data/*
-!data/reference/
-!data/reference/banks.csv
+data/
 logs/
 storage/
 .DS_Store
